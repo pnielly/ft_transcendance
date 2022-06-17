@@ -1,19 +1,21 @@
 import { Button, IconButton } from '@mui/material';
-// import ReactAudioPlayer from 'react-audio-player';
 import VolumeMuteIcon from '@mui/icons-material/VolumeMute';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
+const ReactHowler = require('react-howler');
+const Ozone = require('./ozone.mp3')
 
 type Props = {};
 
 const Music = (props: Props) => {
-//   const [mute, setMute] = useState<boolean>(false);
-//   return (
-//     <div>
-//       <IconButton onClick={() => setMute(!mute)}>{mute ? <VolumeMuteIcon /> : <VolumeUpIcon />}</IconButton>
-//       <ReactAudioPlayer src='NumaOzone.mp3' autoPlay controls muted={mute} />
-//     </div>
-//   );
+  const [play, setPlay] = useState<boolean>(true);
+
+  return (
+    <div className='neon'>
+        <ReactHowler src={Ozone} playing={play} />
+      <IconButton onClick={() => setPlay(!play)}>{!play ? <VolumeMuteIcon /> : <VolumeUpIcon />}</IconButton>
+    </div>
+  );
 };
 
 export default Music;

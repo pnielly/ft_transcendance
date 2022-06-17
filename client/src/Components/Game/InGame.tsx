@@ -7,6 +7,7 @@ import { userInfo } from '../../Interfaces/gameRoom.interface';
 import Canvas from './Canvas';
 import CanvasMobile from './CanvasMobile';
 import DisplayEndGameResult from './DisplayEndGameResult';
+import Music from './Music';
 
 type Props = {
   playerLeft: userInfo | undefined;
@@ -41,6 +42,7 @@ const InGame = (props: Props) => {
         <Grid container justifyContent="center" alignItems="center" sx={{ paddingTop: '50px' }} spacing={4}>
           <Grid item xs={12} md={8}>
             <Canvas options={options} />
+            <Music />
           </Grid>
           <Grid item md={5} xs={12}>
             <h1 className="player-title" style={{ color: 'green', fontSize: '2em', borderRadius: '20px', backgroundColor: 'rgb(28, 26, 26)', padding: '20px 0 20px 0' }}>
@@ -61,6 +63,7 @@ const InGame = (props: Props) => {
       ) : (
         <Grid container justifyContent="center" sx={{ paddingTop: '150px' }}>
           <CanvasMobile options={options} playerLeft={playerLeft} playerRight={playerRight} />
+          <Music />
         </Grid>
       )}
       {gameResult ? <DisplayEndGameResult gameResult={gameResult} roomId={roomId} /> : ''}

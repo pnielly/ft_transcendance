@@ -1,5 +1,5 @@
 # ft_transcendance
-This project consists in an online Pong competition and a chat interface.
+This project consists in an online Pong competition and a chat interface. <br />
 Check out the attached subject for more details.
 
 ## Installation

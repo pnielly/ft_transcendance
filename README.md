@@ -15,5 +15,3 @@ Go to your browser on this address:
 ```python
 http://localhost:3000/
 ```
-
-## Contributing

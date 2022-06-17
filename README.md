@@ -3,7 +3,7 @@ This project consists in the creation of an online Pong competition.
 
 ## Installation
 
-To launch the website, makesure docker is running and type this command at the root:
+To launch the website, make sure docker is running and type this command at the root:
 
 ```bash
 docker-compose up

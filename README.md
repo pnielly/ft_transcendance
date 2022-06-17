@@ -11,7 +11,7 @@ docker-compose up
 
 ## Usage
 
-Go to your your browser on this address:
+Go to your browser on this address:
 ```python
 http://localhost:3000/
 ```

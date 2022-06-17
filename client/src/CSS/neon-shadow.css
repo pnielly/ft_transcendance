@@ -1,0 +1,124 @@
+:root {
+    --clr-neon: rgb(255, 255, 255);
+    --clr-border: rgba(10, 141, 202, 0.856);
+    --clr-border-light: rgba(52, 214, 187, 0.856);
+    --clr-bg: hsl(323 21% 16%);
+    --font-size: 3rem;
+}
+
+*, 
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+.neon-shadow {
+    color: var(--clr-neon);
+    font-size: var(--font-size);
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    border: var(--clr-border) 0.125em solid;
+    border-radius: 0.25em;
+    padding: 0.25em 1em;
+    text-shadow: 
+    0 0 .05em #FFF7,
+    0 0 .30em var(--clr-neon);
+    box-shadow:
+    inset 0 0 .5em var(--clr-border),
+          0 0 .5em var(--clr-border);
+    
+    animation: flickerBorder 20000ms linear infinite; 
+    
+}
+
+/* shadow below the title */
+.neon-shadow::before {
+    content: "";
+    position: absolute;
+    top: 220%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--clr-neon);
+    border: var(--clr-border) 0.35em solid;
+    transform:
+        perspective(0.2em)
+        rotateX(10deg)
+        scale(1.3, 0.40);
+    filter: blur(0.5em);
+    opacity: 0.6;
+    transition: opacity 100ms linear;
+    pointer-events: none;
+}
+
+.neon-shadow::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--clr-border);
+    box-shadow: 0 0 2em var(--clr-border);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 100ms linear;
+}
+
+.neon-shadow:hover::after {
+    opacity: 0.5;
+}
+
+.neon-shadow:hover {
+    color: var(--clr-neon);
+    text-shadow: 
+    0 0 .30em var(--clr-neon);
+
+    box-shadow:
+    inset 0 0 .5em var(--clr-border-light),
+          0 0 .5em var(--clr-border-light);
+}
+
+.neon-shadow:hover::before {
+    opacity: 1;
+    background: var(--clr-border);
+}
+
+.neon-shadow span {
+    animation: flickerText 7000ms linear infinite;
+}
+
+.neon-shadow .delay1 {
+    animation-delay: 1s;
+}
+
+.neon-shadow .delay2 {
+    animation-delay: 3s;
+}
+
+.neon-shadow .delay3 {
+    animation-delay: 4s;
+}
+
+@keyframes flickerText {
+    0% {opacity: 0;}
+    2% {opacity: 1;}
+    4% {opacity: 0;}
+    7% {opacity: 1;}
+    79% {opacity: 1;}
+    80% {opacity: 0;}
+    84% {opacity: 1;}
+    100% {opacity: 1;}
+}
+
+@keyframes flickerBorder {
+    0% {opacity: 0;}
+    1% {opacity: 0.5;}
+    2% {opacity: 0.25;}
+    2.75% {opacity: 1;}
+    79% {opacity: 1;}
+    80% {opacity: 0.5;}
+    81% {opacity: 1;}
+    100% {opacity: 1;}
+}

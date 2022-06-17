@@ -9,13 +9,13 @@ import {
 
 @Entity()
 export class Match {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   player1: User;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.id, { onDelete: 'CASCADE' })
   player2: User;
 
   @Column()
@@ -28,7 +28,10 @@ export class Match {
   winner: number;
 
   @Column()
-  status: 'friendly' | 'ladder';
+  status: string;
+
+  @Column()
+  mode: string;
 
   @CreateDateColumn()
   createdAt: Date;

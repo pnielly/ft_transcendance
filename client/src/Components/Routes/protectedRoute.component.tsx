@@ -3,12 +3,11 @@ import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { UserContext } from '../../Contexts/userContext';
 import axios from 'axios';
-import User from '../Interfaces/user.interface';
+import User from '../../Interfaces/user.interface';
 
 export default function ProtectedRoute({ children }: { children: JSX.Element }) {
   const [page, setPage] = useState<JSX.Element>(<></>);
   const userContext = useContext(UserContext);
-
   useEffect(() => {
     const getUser = async () => {
       axios
@@ -19,7 +18,7 @@ export default function ProtectedRoute({ children }: { children: JSX.Element }) 
           userContext.setUser(res.data);
           setPage(children);
         })
-        .catch((err) => setPage(<Navigate to="/login" replace />));
+        .catch((err) => setPage(<Navigate to="/home" replace />));
     };
     getUser();
   }, []);

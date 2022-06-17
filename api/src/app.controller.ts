@@ -6,7 +6,6 @@ import {
   Req,
   Res,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -15,8 +14,8 @@ import { editFileName, imageFileFilter } from './utils/file-uploading';
 import { diskStorage } from 'multer';
 import { Express } from 'express';
 import { UsersService } from './users/users.service';
-import { JwtAuthGuard } from './auth/jwt.guards';
 import { Request } from 'express';
+import { Public } from './utils/public-route';
 
 @Controller()
 export class AppController {
@@ -25,12 +24,12 @@ export class AppController {
     private readonly userService: UsersService,
   ) {}
 
+  @Public()
   @Get()
   getHello(): string {
     return this.appService.getHello();
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('image', {
@@ -48,12 +47,11 @@ export class AppController {
     const response = {
       originalname: file.originalname,
       filename: file.filename,
-
     };
     if (response) {
-      const url = `${process.env.IMG_URL}${response.filename}`;
+      const url = `${process.env.URL_BACK}/api/images/${response.filename}`;
       const user: any = req.user;
-      await this.userService.updatePicture(user.username, url);
+      await this.userService.update(user.id, { avatar: url });
     }
     return response;
   }

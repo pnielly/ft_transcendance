@@ -1,6 +1,21 @@
 version: "3.8"
 
 services:
+
+  client:
+    container_name: client
+    restart: always
+    build:
+      context: ./client
+      target: development
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    networks:
+      - open
+      
   api:
     container_name: api
     restart: always
@@ -16,7 +31,8 @@ services:
     env_file:
       - api/.env
     networks:
-      - webnet
+      - open
+      - rest_api
     depends_on:
       - postgres
 
@@ -25,7 +41,7 @@ services:
     image: postgres:latest
     restart: always
     networks:
-      - webnet
+      - rest_api
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -34,33 +50,10 @@ services:
       - db:/var/lib/postgresql/data
     env_file:
       - ./.env
-    ports:
-      - 5432:5432
-
-  adminer:
-    image: adminer
-    restart: always
-    networks:
-      - webnet
-    ports:
-      - 8080:8080
-
-  client:
-    container_name: client
-    restart: always
-    build:
-      context: ./client
-      target: development
-    volumes:
-      - ./client:/app
-      - /app/node_modules
-    ports:
-      - 3000:3000
-    networks:
-      - webnet
 
 networks:
-  webnet:
+  open:
+  rest_api:
 
 volumes:
   db:

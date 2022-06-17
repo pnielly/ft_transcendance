@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { createChannelDto } from './dto/create.channel';
@@ -21,13 +22,8 @@ export class ChannelController {
     return this.channelService.findAll();
   }
 
-  @Post('/user_channels')
-  getUserChannels(@Body('id') id: number) {
-    return this.channelService.findUserChannels(id);
-  }
-
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: string) {
     return this.channelService.findOne(id);
   }
 
@@ -37,7 +33,7 @@ export class ChannelController {
   }
 
   @Patch(':id/access')
-  update(@Param('id') id: number, @Body() UpdateChannelDto: UpdateChannelDto) {
+  update(@Param('id') id: string, @Body() UpdateChannelDto: UpdateChannelDto) {
     return this.channelService.update(id, UpdateChannelDto);
   }
 
@@ -47,7 +43,7 @@ export class ChannelController {
   }
 
   @Delete(':id')
-  removeChannel(@Param('id') id: number) {
+  removeChannel(@Param('id') id: string) {
     return this.channelService.remove(id);
   }
 
@@ -58,14 +54,14 @@ export class ChannelController {
   }
 
   @Get(':id/messages')
-  findAllMessage(@Param('id') channelId: number) {
+  findAllMessage(@Param('id') channelId: string) {
     return this.channelService.messageList(channelId);
   }
 
   // PASSWORD
   @Post(':id/check_password')
   checkPassword(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() password: { password: string },
   ) {
     return this.channelService.verifyPassword(password.password, id);
@@ -73,55 +69,61 @@ export class ChannelController {
 
   // ADMIN
   @Post(':id/add_admin')
-  addAdmin(@Param('id') id: number, @Body() param: { adminId: number }) {
+  addAdmin(@Param('id') id: string, @Body() param: { adminId: string }) {
     return this.channelService.addAdmin(id, param.adminId);
   }
 
   @Get(':id/get_admins')
-  getAdmins(@Param('id') id: number) {
+  getAdmins(@Param('id') id: string) {
     return this.channelService.findAdmins(id);
   }
 
   @Delete(':id/remove_admin')
-  removeAdmin(@Param('id') id: number, @Body() param: { adminId: number }) {
+  removeAdmin(@Param('id') id: string, @Body() param: { adminId: string }) {
     return this.channelService.removeAdmin(id, param.adminId);
   }
 
   // MEMBER
   @Post(':id/add_member')
-  addMember(@Param('id') id: number, @Body() param: { memberId: number }) {
+  addMember(@Param('id') id: string, @Body() param: { memberId: string }) {
     return this.channelService.addMember(id, param.memberId);
   }
 
   @Get(':id/get_members')
-  async getMembers(@Param('id') id: number) {
+  async getMembers(@Param('id') id: string) {
     return await this.channelService.findMembers(id);
   }
 
   @Delete(':id/remove_member')
-  removeMember(@Param('id') id: number, @Body() param: { memberId: number }) {
+  removeMember(@Param('id') id: string, @Body() param: { memberId: string }) {
     return this.channelService.removeMember(id, param.memberId);
   }
 
   // BANNED
   @Post(':id/add_banned')
-  addBanned(@Param('id') id: number, @Body() param: { bannedId: number }) {
+  addBanned(@Param('id') id: string, @Body() param: { bannedId: string }) {
     return this.channelService.addBanned(id, param.bannedId);
   }
 
   @Get(':id/get_banned')
-  async getBanneds(@Param('id') id: number) {
+  async getBanned(@Param('id') id: string) {
     return await this.channelService.findBanned(id);
   }
 
   @Delete(':id/remove_banned')
-  removeBanned(@Param('id') id: number, @Body() param: { bannedId: number }) {
+  removeBanned(@Param('id') id: string, @Body() param: { bannedId: string }) {
     return this.channelService.removeBanned(id, param.bannedId);
   }
 
   // MUTED
   @Get(':id/get_muted')
-  async getMuteds(@Param('id') id: number) {
+  async getMuted(@Param('id') id: string) {
     return await this.channelService.findMuted(id);
+  }
+
+  // get user's channelList
+  @Get(':id/channels')
+  getUserChannels(@Param('id') id: string) {
+    return this.channelService.findUserChannels(id);
   }
 }

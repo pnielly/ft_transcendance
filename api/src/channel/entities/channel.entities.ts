@@ -12,12 +12,11 @@ import {
   BeforeInsert,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { ConsoleLogger } from '@nestjs/common';
 
 @Entity()
 export class Channel {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
@@ -28,22 +27,22 @@ export class Channel {
   @Column({ nullable: true })
   password?: string;
 
-  @ManyToOne(() => User, (user) => user.ownChannels)
+  @ManyToOne(() => User, (user: User) => user.ownChannels, { onDelete: 'CASCADE', })
   owner: User;
 
   @ManyToMany(() => User, { cascade: true })
   @JoinTable()
   members: User[];
 
-  @ManyToMany(() => User, {cascade: true })
+  @ManyToMany(() => User, { cascade: true })
   @JoinTable()
   admins: User[];
 
-  @ManyToMany(() => User, {cascade: true })
+  @ManyToMany(() => User, { cascade: true })
   @JoinTable()
   banned: User[];
 
-  @ManyToMany(() => User, {cascade: true })
+  @ManyToMany(() => User, { cascade: true })
   @JoinTable()
   muted: User[];
 
@@ -61,10 +60,9 @@ export class Channel {
   }
 
   async comparePassword(attempt: string) {
-    console.log('Comparing passwords : ', attempt, ' and ', this.password)
     return await bcrypt.compare(attempt, this.password);
   }
-  
+
   toResponseObjet() {
     const { id, name, access, owner, members, messages, createdAt } = this;
     return { id, name, access, owner, members, messages, createdAt };

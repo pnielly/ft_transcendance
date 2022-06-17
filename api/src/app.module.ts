@@ -14,6 +14,10 @@ import { Match } from './match/entities/match.entity';
 import { MatchModule } from './match/match.module';
 import { Elo } from './match/entities/elo.entity';
 import { MulterModule } from '@nestjs/platform-express';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import JwtTwoFactorGuard from './auth/guards/jwt-two-factor.guard';
+import { LoggingFilterInterceptor } from './utils/logs.interceptor';
+import { EloModule } from './elo/elo.module';
 
 @Module({
   imports: [
@@ -34,11 +38,19 @@ import { MulterModule } from '@nestjs/platform-express';
     PongModule,
     MatchModule,
     ChannelModule,
+    EloModule,
     MulterModule.register({
       dest: './files',
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtTwoFactorGuard,
+    },
+    { provide: APP_INTERCEPTOR, useClass: LoggingFilterInterceptor },
+  ],
 })
 export class AppModule {}

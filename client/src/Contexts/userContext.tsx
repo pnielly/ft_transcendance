@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import User from '../Components/Interfaces/user.interface';
+import User from '../Interfaces/user.interface';
 
 export interface context {
   user: User;
@@ -7,6 +7,6 @@ export interface context {
 }
 
 export const UserContext = createContext<context>({
-  user: { id: -1, username: '', id_42: '', avatar: '' },
+  user: { id: '-1', username: '', id_42: '', avatar: '', isTwoFactorAuthenticationEnabled: false },
   setUser: () => {}
 });

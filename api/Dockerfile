@@ -1,10 +1,10 @@
-FROM node:16-alpine As development
+FROM node:16.15.1-alpine As development
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 COPY . .
 

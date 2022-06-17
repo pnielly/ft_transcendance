@@ -1,6 +1,5 @@
 import { FormEvent, useContext, useState } from 'react';
-import { socketChat, SocketContext } from '../../Contexts/socket';
-import user from '../Interfaces/user.interface';
+import { SocketContext } from '../../Contexts/socket';
 
 type Props = {
   onLoginSubmit: (login: string) => void;
@@ -17,8 +16,7 @@ const Login = (props: Props) => {
   function saveLogin(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     sockContext.socketChat.emit('loginToServer', { login: newInput, id: sockContext.socketChat.id });
-    console.log('OMG: ' + sockContext.socketChat.id)
-    props.onLoginSubmit(newInput)
+    props.onLoginSubmit(newInput);
   }
 
   const title = "What's your login?";

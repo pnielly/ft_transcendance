@@ -11,5 +11,5 @@ export class createChannelDto {
   password?: string;
 
   @IsNumber()
-  userId: number;
+  userId: string;
 }

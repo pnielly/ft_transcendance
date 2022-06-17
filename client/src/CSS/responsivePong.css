@@ -1,0 +1,8 @@
+.game {
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  transform: 'rotate(90deg)';
+}

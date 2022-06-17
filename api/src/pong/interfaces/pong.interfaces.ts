@@ -1,16 +1,11 @@
-export interface gameRoomMap {
-  [gameRoomId: string]: gameRoom;
-}
-
 export interface gameRoom {
   state: Match;
   players: [userInfo, userInfo];
-  intervalId: NodeJS.Timer;
   friendly: boolean;
 }
 
 export interface userInfo {
-  id: number;
+  id: string;
   username: string;
   id_42: string;
   avatar: string;
@@ -22,8 +17,9 @@ export type Match = {
   playerLeft: player;
   playerRight: player;
   ball: ball;
-  intervalId: NodeJS.Timer;
+  ballBonus: ball;
   isFinish: boolean;
+  options: Options;
 };
 
 export type ball = {
@@ -47,4 +43,9 @@ export type player = {
 
 export interface clientToRoom {
   [clientId: string]: string;
+}
+
+export interface Options {
+  doubleBall: boolean;
+  paddle: boolean;
 }

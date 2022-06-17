@@ -7,5 +7,5 @@ export class createMessageDto {
   senderName: string;
 
   @IsNumber()
-  channelId: number;
+  channelId: string;
 }

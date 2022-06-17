@@ -8,6 +8,10 @@ import { createChannelDto } from './dto/create.channel';
 import { createMessageDto } from './dto/create.message';
 import { Message } from './entities/message.entities';
 import { UpdateChannelDto } from './dto/update.channel';
+import { createMuteStateDto } from './dto/create.muteState';
+
+import * as bcrypt from 'bcrypt';
+import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class ChannelService {
@@ -28,19 +32,36 @@ export class ChannelService {
     });
   }
 
-  amIMember(memberList: User[], userId: number): boolean {
+  amIMember(memberList: User[], userId: string): boolean {
     let res: boolean = false;
-    memberList.map((e) => (e.id === userId ? (res = true) : null));
+    memberList.map((e: User) => (e.id == userId ? (res = true) : null));
     return res;
   }
 
+  async areFriends(aId: string, bId: string) {
+    const friendList = await this.userService.findFriends(aId);
+    let ret: boolean = false;
+    friendList.map((u:User) => u.id === bId ? ret = true : null)
+    return ret
+  }
+
   // will return all channels except private channels where the user is not a member
-  async findUserChannels(userId: number) {
+  async findUserChannels(userId: string) {
+    // get private channels
     let privList = await this.channelRepository.find({
       relations: ['owner', 'members', 'admins', 'messages'],
       where: { access: 'private' },
     });
-    privList = privList.filter((e) => this.amIMember(e.members, userId));
+    privList = privList.filter((e: Channel) => this.amIMember(e.members, userId));
+    // filter out DM channels where the users are not friends
+    for (const c of privList) {
+      if (!(c.members[0] && c.members[1])) break ;
+      const ret = await this.areFriends(c.members[0].id, c.members[1].id);
+      if (c.name.substring(0,3) === 'dm-' && !ret) {
+        privList = privList.filter((e: Channel) => e.id !== c.id);
+      }
+    }
+    // get the other channels
     let totalList = await this.channelRepository.find({
       relations: ['owner', 'members', 'admins', 'messages'],
       where: [{ access: 'public' }, { access: 'protected' }],
@@ -48,7 +69,18 @@ export class ChannelService {
     return totalList.concat(privList);
   }
 
-  async findOne(id: number): Promise<Channel> {
+  async findDMByMembers(fromId: string, blockId: string) {
+    let chanList = await this.channelRepository.find({
+      relations: ['members'], where: [{ access: 'private' }]})
+      // filter to get the DM chan
+    const chan: Channel = chanList.filter((e: Channel) => (this.amIMember(e.members, fromId) && this.amIMember(e.members, blockId) && e.name.substring(0, 3) === 'dm-'))[0];
+    if (!chan) {
+      throw new NotFoundException(`DM Channel with ${fromId} and ${blockId} not found`);
+    }
+    return chan;
+  }
+
+  async findOne(id: string): Promise<Channel> {
     const channel = await this.channelRepository.findOne(id, {
       relations: ['messages', 'members', 'owner'],
     });
@@ -66,9 +98,9 @@ export class ChannelService {
     return channel;
   }
 
-////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////
 
-// CREATE, UPDATE AND DELETE /////////////////////////////
+  // CREATE, UPDATE AND DELETE /////////////////////////////
   async createChannel(createChat: createChannelDto) {
     const user: User = await this.userService.findOne(createChat.userId);
     const channel = new Channel();
@@ -78,48 +110,71 @@ export class ChannelService {
       channel.password = createChat.password;
     channel.owner = user;
     channel.members = [user];
-    return this.channelRepository.save(channel);
+    return await this.channelRepository.save(channel);
     // return channel.toResponseObjet();
   }
 
-  async update(id: number, updateChannelDto: UpdateChannelDto) {
+  async update(id: string, updateChannelDto: UpdateChannelDto) {
     // console.log('UPDATING CHANNEL: ', updateChannelDto);
     // const channel = await this.channelRepository.preload({
     //   id: id,
     //   ...updateChannelDto,
     // });
-    const channel = await this.channelRepository.findOne(id);
-    if (!channel) {
-      throw new NotFoundException(`[Update:] Channel #${id} not found`);
-    }
-    channel.access = updateChannelDto.access;
-    channel.password = updateChannelDto.password;
-    return this.channelRepository.save(channel);
+    // const channel = await this.channelRepository.findOne(id);
+    // if (!channel) {
+    //   throw new NotFoundException(`[Update:] Channel #${id} not found`);
+    // }
+    // channel.access = updateChannelDto.access;
+    // channel.password = updateChannelDto.password;
+    // return this.channelRepository.save(channel);
   }
 
-  async changeAccess(param: { access: string, password: string, channelId: number }) {
-    const channel = await this.channelRepository.findOne(param.channelId)
+  async changeAccess(param: {
+    access: string;
+    password: string;
+    channelId: string;
+  }) {
+    const channel = await this.channelRepository.findOne(param.channelId);
     if (!channel) {
-      throw new NotFoundException(`[Update:] Channel #${param.channelId} not found`);
+      throw new NotFoundException(
+        `[Update:] Channel #${param.channelId} not found`,
+      );
     }
     channel.access = param.access;
-    channel.password = param.password;
-    return this.channelRepository.save(channel)
+    channel.password = await bcrypt.hash(param.password, 10);
+    return await this.channelRepository.save(channel);
+  }
+
+  async changeOwner(channelId: string, heirId: string) {
+    const channel = await this.channelRepository.findOne(channelId);
+    if (!channel) {
+      throw new NotFoundException(
+        `[Update:] Channel #${channelId} not found`,
+      );
+    }
+    const user = await this.userRepository.findOne(heirId);
+    if (!user) {
+      throw new NotFoundException(
+        `[Update:] User #${heirId} not found`,
+      );
+    }
+    channel.owner = user;
+    return await this.channelRepository.save(channel);
   }
 
   async removeAll() {
     const channels = await this.findAll();
     for (let i = 0; i < channels.length; i++)
-      this.channelRepository.remove(channels[i]);
+      await this.channelRepository.remove(channels[i]);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const channel = await this.findOne(id);
-    return this.channelRepository.remove(channel);
+    return await this.channelRepository.remove(channel);
   }
 
   // HANDLE MESSAGES /////////////////////////////////////////
-  async messageList(channelId: number) {
+  async messageList(channelId: string) {
     const data = await this.channelRepository.findOne(channelId, {
       relations: ['messages'],
     });
@@ -136,10 +191,10 @@ export class ChannelService {
     message.channel = channel;
     message.content = createMessage.content;
     message.senderName = createMessage.senderName;
-    return this.messageRepository.save(message);
+    return await this.messageRepository.save(message);
   }
 
-  async findMessageChannel(messageId: number) {
+  async findMessageChannel(messageId: string) {
     const message = await this.messageRepository.findOne(messageId, {
       relations: ['channels'],
     });
@@ -150,24 +205,24 @@ export class ChannelService {
   }
 
   // HANDLE PASSWORD /////////////////////////////////////
-  async verifyPassword(password: string, channelId: number): Promise<boolean> {
+  async verifyPassword(password: string, channelId: string): Promise<boolean> {
     const channel = await this.findOne(channelId);
     return channel.comparePassword(password);
   }
 
   // HANDLE ADMIN ////////////////////////////////////////
-  async addAdmin(id: number, adminId: number) {
+  async addAdmin(id: string, adminId: string) {
     const admin = await this.userRepository.findOne(adminId);
     const channel = await this.channelRepository.findOne(id, {
       relations: ['admins'],
     });
-    // if (!channel.admins.includes(admin)) {
+    if (!channel.admins.includes(admin)) {
     channel.admins.push(admin);
-    this.channelRepository.save(channel);
-    // }
+    await this.channelRepository.save(channel);
+   }
   }
 
-  async findAdmins(id: number): Promise<User[]> {
+  async findAdmins(id: string): Promise<User[]> {
     const channel = await this.channelRepository.findOne(id, {
       relations: ['admins'],
     });
@@ -177,28 +232,31 @@ export class ChannelService {
     return channel.admins;
   }
 
-  async removeAdmin(id: number, adminId: number) {
+  async removeAdmin(id: string, adminId: string) {
     const channel = await this.channelRepository.findOne(id, {
       relations: ['admins'],
     });
+   
+    if (!channel) return;
     const toDelete = channel.admins.findIndex((c) => c.id === adminId);
-    channel.admins.splice(toDelete, 1);
-    this.channelRepository.save(channel);
+   
+    if (toDelete !== -1) channel.admins.splice(toDelete, 1);
+    return await this.channelRepository.save(channel);
   }
 
   // HANDLE MEMBERS ///////////////////////////////
-  async addMember(id: number, memberId: number) {
+  async addMember(id: string, memberId: string) {
     const member = await this.userRepository.findOne(memberId);
     const channel = await this.channelRepository.findOne(id, {
       relations: ['members'],
     });
     if (!channel.members.includes(member)) {
       channel.members.push(member);
-      this.channelRepository.save(channel);
+      await this.channelRepository.save(channel);
     }
   }
 
-  async findMembers(id: number): Promise<User[]> {
+  async findMembers(id: string): Promise<User[]> {
     const channel = await this.channelRepository.findOne(id, {
       relations: ['members'],
     });
@@ -208,28 +266,33 @@ export class ChannelService {
     return channel.members;
   }
 
-  async removeMember(id: number, memberId: number) {
+  async removeMember(id: string, memberId: string) {
     const channel = await this.channelRepository.findOne(id, {
       relations: ['members'],
     });
+    if (!channel) return;
     const toDelete = channel.members.findIndex((c) => c.id === memberId);
     channel.members.splice(toDelete, 1);
-    this.channelRepository.save(channel);
+    return await this.channelRepository.save(channel);
   }
 
   // HANDLE BANNED ///////////////////////////////
-  async addBanned(id: number, bannedId: number) {
+  async addBanned(id: string, bannedId: string) {
     const banned = await this.userRepository.findOne(bannedId);
     const channel = await this.channelRepository.findOne(id, {
       relations: ['banned'],
     });
+    if (!banned || !channel) throw new NotFoundException('NOT FOUND');
     if (!channel.banned.includes(banned)) {
       channel.banned.push(banned);
-      this.channelRepository.save(channel);
+     
+      return await this.channelRepository.save(channel);
+
     }
+    return banned;
   }
 
-  async findBanned(id: number): Promise<User[]> {
+  async findBanned(id: string): Promise<User[]> {
     const channel = await this.channelRepository.findOne(id, {
       relations: ['banned'],
     });
@@ -239,32 +302,35 @@ export class ChannelService {
     return channel.banned;
   }
 
-  async removeBanned(id: number, bannedId: number) {
+  async removeBanned(id: string, bannedId: string) {
     const channel = await this.channelRepository.findOne(id, {
       relations: ['banned'],
     });
-    const toDelete = channel.banned.findIndex((c) => c.id === bannedId);
-    channel.banned.splice(toDelete, 1);
-    this.channelRepository.save(channel);
+    if (!channel) return;
+    const toDelete = channel.banned.findIndex((c: User) => c.id === bannedId);
+    if (toDelete !== -1) channel.banned.splice(toDelete, 1);
+    return await this.channelRepository.save(channel);
   }
 
   // HANDLE MUTE ///////////////////////////////
-  async addMuted(id: number, mutedId: number, muteTime: number) {
+  async addMuted(id: string, mutedId: string, muteTime: number) {
     const muted = await this.userRepository.findOne(mutedId);
     const channel = await this.channelRepository.findOne(id, {
       relations: ['muted'],
     });
     if (!channel.muted.includes(muted)) {
       channel.muted.push(muted);
-      this.channelRepository.save(channel);
+      await this.channelRepository.save(channel);
     }
-    // unmute after given time
-    setTimeout(() => {
-      this.removeMuted(id, mutedId);
+
+    // will unmute automatically user after <muteTime> ms
+    const timeOutId = setTimeout(async () => {
+      await this.removeMuted(id, mutedId);
     }, muteTime)
+    return timeOutId;
   }
 
-  async findMuted(id: number): Promise<User[]> {
+  async findMuted(id: string): Promise<User[]> {
     const channel = await this.channelRepository.findOne(id, {
       relations: ['muted'],
     });
@@ -274,12 +340,50 @@ export class ChannelService {
     return channel.muted;
   }
 
-  async removeMuted(id: number, mutedId: number) {
+  async removeMuted(id: string, mutedId: string) {
     const channel = await this.channelRepository.findOne(id, {
       relations: ['muted'],
     });
+    if (!channel) return;
     const toDelete = channel.muted.findIndex((c) => c.id === mutedId);
-    channel.muted.splice(toDelete, 1);
-    this.channelRepository.save(channel);
+    if (toDelete !== -1) channel.muted.splice(toDelete, 1);
+    await this.channelRepository.save(channel);
+  }
+
+  // User Roles
+
+  async isOwner(user: User, id: number): Promise<boolean> {
+    const channel = await this.channelRepository.findOne(id, {
+      relations: ['owner'],
+    });
+    if (!channel) {
+      throw new WsException(`Channel ${id} not Found `);
+    }
+    if (channel.owner.id === user.id) return true;
+    return false;
+  }
+
+  async isAdmin(user: User, id: number): Promise<boolean> {
+    const channel = await this.channelRepository.findOne(id, {
+      relations: ['admins'],
+    });
+    if (!channel) {
+      throw new WsException(`Channel ${id} not Found `);
+    }
+    const check = channel.admins.find((admin: User) => admin.id === user.id);
+    if (check) return true;
+    return false;
+  }
+
+  async isMember(user: User, id: number): Promise<boolean> {
+    const channel = await this.channelRepository.findOne(id, {
+      relations: ['members'],
+    });
+    if (!channel) {
+      throw new WsException(`Channel ${id} not Found `);
+    }
+    const check = channel.members.find((member) => member.id === user.id);
+    if (check) return true;
+    return false;
   }
 }

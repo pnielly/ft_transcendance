@@ -9,8 +9,8 @@ import { Channel } from './channel.entities';
 
 @Entity()
 export class Message {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn("uuid")
+  id: string;
 
   @Column()
   content: string;
@@ -18,7 +18,7 @@ export class Message {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Channel, (channel) => channel.messages, {
+  @ManyToOne(() => Channel, (channel: Channel) => channel.messages, {
     onDelete: 'CASCADE',
   })
   channel: Channel;

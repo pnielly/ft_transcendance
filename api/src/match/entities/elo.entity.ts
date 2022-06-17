@@ -12,16 +12,21 @@ export class Elo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
-
-  @Column()
-  rank: number;
 
   @Column()
   win: number;
 
   @Column()
   defeat: number;
+
+  @Column()
+  points: number;
+
+  toResponseObject() {
+    const { win, defeat, points } = this;
+    return { win, defeat, points };
+  }
 }

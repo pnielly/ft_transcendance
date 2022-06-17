@@ -1,44 +1,24 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import axios from 'axios';
-import React, { useState } from 'react';
-import { useEffect } from 'react';
-import User from '../Components/Interfaces/user.interface';
 import { useParams } from 'react-router-dom';
-import TableMatchHistory from '../Components/Ranking/TableMatchHistory';
-import { Button } from '@mui/material';
-
-interface MatchHistory {
-  id: number;
-  score1: number;
-  score2: number;
-  winner: number;
-  createdAt: Date;
-  player1: User;
-  player2: User;
-}
+import TableMatchHistory from '../Components/Game/Ranking/TableMatchHistory';
+import { Container, Grid } from '@mui/material';
+import '../CSS/rainbow.css';
 
 const UserMatchHistory = () => {
   let { userId } = useParams();
-  const [status, setStatus] = useState<'ladder' | 'friendly'>('ladder');
-
-  function handleChange(e: React.MouseEvent<HTMLButtonElement>) {
-    if (e.currentTarget.value === 'ladder') setStatus('friendly');
-    else setStatus('ladder');
-  }
 
   return (
-    <React.Fragment>
-      <Button onClick={handleChange} value={status}>
-        See {status === 'ladder' ? 'friendly' : 'ladder'} history
-      </Button>
-      <TableMatchHistory status={status} userId={userId} />
-    </React.Fragment>
+    <Container maxWidth="xl">
+      <Grid container justifyContent="center">
+        <Grid item xs={12}>
+          <h1 className="classic" style={{ textAlign: 'center', fontSize: '3em', opacity: '0.6' }}>
+            Match History
+          </h1>
+        </Grid>
+        <Grid item md={8}>
+          <TableMatchHistory userId={userId} limit={0} />
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
 

@@ -4,11 +4,11 @@ import {
   Delete,
   Get,
   Param,
-  ParseEnumPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CreateMatchDto } from './dto/create.matchHistory';
-import { EloService } from './elo.service';
+import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { MatchService } from './match.service';
 
 @Controller('match')
@@ -20,18 +20,16 @@ export class MatchController {
     return this.matchService.findAll();
   }
 
-  @Get('historyfriendly/:id')
-  findFriendlyMatchHistoryOfUser(@Param('id') userId: number) {
-    return this.matchService.getMatchHistoryOfUser(userId, 'friendly');
-  }
-
-  @Get('historyladder/:id')
-  findLadderMatchHistoryOfUser(@Param('id') userId: number) {
-    return this.matchService.getMatchHistoryOfUser(userId, 'ladder');
+  @Get('history/:id')
+  findRankedMatchHistoryOfUser(
+    @Param('id') userId: string,
+    @Query() paginationQuery: PaginationQueryDto,
+  ) {
+    return this.matchService.getMatchHistoryOfUser(userId, paginationQuery);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: string) {
     return this.matchService.findOne(id);
   }
 
@@ -41,7 +39,7 @@ export class MatchController {
   }
 
   @Delete(':id')
-  removeOne(@Param('id') id: number) {
+  removeOne(@Param('id') id: string) {
     return this.matchService.remove(id);
   }
 

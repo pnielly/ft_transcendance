@@ -2,10 +2,10 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class CreateMatchDto {
   @IsNumber()
-  player1: number;
+  player1: string;
 
   @IsNumber()
-  player2: number;
+  player2: string;
 
   @IsNumber()
   score1: number;
@@ -17,5 +17,8 @@ export class CreateMatchDto {
   winner: number;
 
   @IsString()
-  status: 'friendly' | 'ladder';
+  status: 'friendly' | 'ranked';
+
+  @IsString()
+  mode: 'doubleBall' | 'paddle' | 'normal';
 }

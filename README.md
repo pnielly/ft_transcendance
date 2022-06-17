@@ -1,5 +1,6 @@
 # ft_transcendance
 This project consists in an online Pong competition and a chat interface.
+Check out the attached subject for more details.
 
 ## Installation
 
@@ -15,3 +16,4 @@ Go to your browser on this address:
 ```python
 http://localhost:3000/
 ```
+[ft_transcendance.pdf](https://github.com/pnielly/ft_transcendance/files/8929224/ft_transcendance.pdf)

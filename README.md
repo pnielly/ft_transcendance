@@ -4,7 +4,7 @@ Check out the attached subject for more details.
 
 ## Installation
 
-To launch the website, make sure docker is running and type this command at the root:
+To launch the website, make sure docker is running and type this command at the root of the repo:
 
 ```bash
 docker-compose up

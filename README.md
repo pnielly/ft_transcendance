@@ -11,6 +11,7 @@ Some features:
 - game invite
 - channel invite
 - public, protected (public with password), private channels
+- channel admin (mute/ban users)
 - double authentification
 - recovering the game when leaving before the end
 - miscellaneous game modes

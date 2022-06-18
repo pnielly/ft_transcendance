@@ -17,7 +17,7 @@ Some features:
 - miscellaneous game modes
 - achievements
 - background music while playing (the best one)
-- login using 42API is possible
+- login using 42API or creating new profile
 - and much more...
 
 Check out the attached subject for more details.

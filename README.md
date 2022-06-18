@@ -1,5 +1,12 @@
 # ft_transcendance
 This project consists in creating a website hosting an online Pong competition and a chat interface. </br></br>
+
+Stack: 
+![TYPESCRIPT](https://img.shields.io/badge/TYPESCRIPT-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![REACT](https://img.shields.io/badge/REACT-61DAFB?style=for-the-badge&logo=react&logoColor=white)
+![NESTJS](https://img.shields.io/badge/NESTJS-CC013A?style=for-the-badge&logo=nestjs&logoColor=white)
+![DOCKER](https://img.shields.io/badge/DOCKER-0DB7ED?style=for-the-badge&logo=docker&logoColor=white)
+</br></br>
 Some features:
 - friend request
 - game invite

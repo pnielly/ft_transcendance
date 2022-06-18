@@ -13,7 +13,7 @@ Some features:
 - public, protected (public with password), private channels
 - double authentification
 - recovering the game when leaving before the end
-- different game modes
+- miscellaneous game modes
 - login using 42API is possible
 - and much more...
 

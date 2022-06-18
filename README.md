@@ -14,6 +14,8 @@ Some features:
 - double authentification
 - recovering the game when leaving before the end
 - miscellaneous game modes
+- achievements
+- background music (the best one)
 - login using 42API is possible
 - and much more...
 

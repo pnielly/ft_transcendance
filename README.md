@@ -1,5 +1,5 @@
 # ft_transcendance
-This project consists in creating a website hosting an online Pong competition and a chat interface. <br />
+This project consists in creating a website hosting an online Pong competition and a chat interface. </br></br>
 Some features:
 - friend request
 - game invite

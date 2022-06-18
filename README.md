@@ -1,5 +1,16 @@
 # ft_transcendance
-This project consists in an online Pong competition and a chat interface. <br />
+This project consists in creating a website hosting an online Pong competition and a chat interface. <br />
+Some features:
+- friend request
+- game invite
+- channel invite
+- public, protected (public with password), private channels
+- double authentification
+- recovering the game when leaving before the end
+- different game modes
+- login using 42API is possible
+- and much more...
+
 Check out the attached subject for more details.
 
 ## Installation

@@ -37,7 +37,6 @@ const FriendInvites = (props: Props) => {
 
   // update friendRequestList
   const updateFriendRequestList = useCallback(() => {
-    console.log('udpateFriendRequest');
     axios
       .get(`${process.env.REACT_APP_DEFAULT_URL}/users/${me.id}/get_friend_requests`, { withCredentials: true })
       .then((res) => {
@@ -53,7 +52,6 @@ const FriendInvites = (props: Props) => {
 
   // update FriendRequestList on change
   useEffect(() => {
-    console.log('updateFirend')
     sockContext.socketUser.on('updateFriendRequestList', updateFriendRequestList);
     return () => {
       sockContext.socketUser.off('updateFriendRequestList', updateFriendRequestList);

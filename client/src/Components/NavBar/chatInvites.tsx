@@ -37,7 +37,6 @@ const ChatInvites = (props: Props) => {
 
   // updateChannelInviteList
   const updateInviteList = useCallback(() => {
-    console.log('updteList')
     axios
       .get(`${process.env.REACT_APP_DEFAULT_URL}/users/${me.id}/get_chat_invites`, { withCredentials: true })
       .then((res) => setChatInvites(res.data))
@@ -51,10 +50,8 @@ const ChatInvites = (props: Props) => {
 
   // update on change
   useEffect(() => {
-    console.log('chat invite')
     sockContext.socketChat.on('updateChatInviteList', updateInviteList);
     return () => {
-      console.log('socket off')
       sockContext.socketChat.off('updateChatInviteList', updateInviteList);
     }
   }, []);

@@ -30,8 +30,6 @@ const Pong = (props: Props) => {
   const [isWaiting, setIsWaiting] = useState<boolean>(false);
   const sizeScreen = useWindowSize();
 
-console.log('me:', me)
-
   useEffect(() => {
     switch (option) {
       case modes[1]:
@@ -50,6 +48,8 @@ console.log('me:', me)
   };
   // SAY HELLOW I AM LOGIN
   useEffect(() => {
+    console.log('[ONLINE] me.id: ', me.id);
+    
     sockContext.socketPong.emit('online', me.id);
   }, [sockContext.socketPong]);
 

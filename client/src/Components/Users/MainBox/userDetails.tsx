@@ -76,7 +76,6 @@ const UserDetails = (props: Props) => {
 
   // Send friend Requests /////////////////////////
   const sendFriendRequest = (e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log('sending invite frind')
     if (isBlocked(me)) setShowBlocked(true);
     else {
       sockContext.socketUser.emit('friendRequestSent', { fromId: me.id, toId: selectedUser?.id });

@@ -79,11 +79,14 @@ export class PongGateway
     } catch {
       return this.disconnect(client);
     }
+
+
+
     console.log(client.id, 'pong connected');
   }
 
   private disconnect(client: Socket) {
-    client.emit('Error', new WsException('Invalid credentilas'));
+    client.emit('Error', new WsException('Invalid credentials'));
     client.disconnect();
     console.log(client.id, 'pong disconnected');
   }
@@ -167,14 +170,6 @@ export class PongGateway
       this.server
         .to(answer.guest.id)
         .emit('invitationExpired', answer.invitation);
-
-      // remove invite from gameInvites
-      // const userId = this.clientToUser[client.id];
-      // if (!userId) return;
-      // const toDelete = this.gameInvites[userId].findIndex(
-      //   (i) => i.sender.id === answer.invitation.sender.id,
-      // );
-      // this.gameInvites[userId].splice(toDelete, 1);
       this.server
         .to(answer.guest.id)
         .emit('updateGameInvites', this.gameInvites);

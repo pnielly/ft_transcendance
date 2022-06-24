@@ -1,0 +1,1 @@
+in Landing page -> function logIn -> reload page to fix socket io not running (is there a better way?)

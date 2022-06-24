@@ -92,6 +92,7 @@ const Chat = (props: Props) => {
   };
 
   const updateMessages = () => {
+    console.log('updateMessage')
     if (activeChannel?.id) {
       api
         .getMessages(activeChannel.id)
@@ -221,6 +222,7 @@ const Chat = (props: Props) => {
 
   // update MessageList on change
   useEffect(() => {
+    console.log('activeChannel', activeChannel)
     sockContext.socketChat.on('updateMessageList', updateMessages);
     return () => {
       sockContext.socketChat.off('updateMessageList', updateMessages);

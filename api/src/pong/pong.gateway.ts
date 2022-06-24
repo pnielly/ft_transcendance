@@ -95,7 +95,7 @@ export class PongGateway
     this.logger.log('DISCONNECT FROM GAME: ' + client.id);
     delete this.clientToRoom[client.id];
 
-    // delete UserStatus to offline
+    // delete UserStatus
     const userId = this.clientToUser[client.id];
     if (userId) delete this.usersStatus[userId];
     delete this.clientToUser[client.id];
@@ -106,18 +106,35 @@ export class PongGateway
       delete this.gameRooms[client.id];
     }
     this.server.emit('statusOfUsers', this.usersStatus);
+    console.log('disco status', this.usersStatus);
+    
   }
 
   @SubscribeMessage('online')
   online(@ConnectedSocket() client: Socket, @MessageBody() userId: string) {
     this.usersStatus[userId] = 'online';
     this.clientToUser[client.id] = userId;
-    client.join(String(userId));
+    client.join(userId);
     this.server.emit('statusOfUsers', this.usersStatus);
     if (this.gameInvites[userId])
       this.server
         .to(userId)
         .emit('updateGameInviteList', this.gameInvites[userId]);
+
+        console.log('userId', userId);
+        
+        console.log('online event status', this.usersStatus);
+  }
+
+  @SubscribeMessage('offline')
+  offline(@ConnectedSocket() client: Socket) {
+    // delete UserStatus
+    const userId = this.clientToUser[client.id];
+    if (userId) delete this.usersStatus[userId];
+    delete this.clientToUser[client.id];
+    delete this.gameInvites[client.id];
+
+    client.leave(userId);
   }
 
   @SubscribeMessage('gameInvitation')

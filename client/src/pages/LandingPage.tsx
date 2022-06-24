@@ -71,7 +71,11 @@ const LandingPage = (props: Props) => {
       .then((res) => {
         userContext.setUser(res.data);
         if (res.data.isTwoFactorAuthenticationEnabled) navigate('/2fwa');
-        else navigate('/game');
+        else {
+          navigate('/game');
+          // reload to force socket.io to start... (not sure it's the best fix)
+          window.location.reload();
+        }
       })
       .catch((err) => {
         if (err.response) {
@@ -195,15 +199,15 @@ const LandingPage = (props: Props) => {
             ''
           )}
         </Grid>
-        <Grid item>
+        <Grid item >
           <Button onClick={() => setNot42(!not42)} className={not42 ? 'neon-shadow delay1' : 'neon-flicker delay1'} variant="outlined">
             {not42 ? 'Back' : "I'm not from 42"}
           </Button>
         </Grid>
         {not42 ? (
           <div>
-            <Grid container alignItems="center" direction="row" spacing={4} justifyContent="center">
-              <Grid item>
+            <Grid container alignItems="center" direction="row" spacing={3} justifyContent="center">
+              <Grid item md={5} xs={12} sx={{ position: 'relative', left: '200px' }}>
                 <TextField
                   className="neon-flicker"
                   value={username}
@@ -216,7 +220,7 @@ const LandingPage = (props: Props) => {
                   }}
                 />
               </Grid>
-              <Grid item>
+              <Grid item md={6} xs={12} sx={{ position: 'relative', left: '200px' }}>
                 <TextField
                   className="neon-flicker"
                   type="password"

@@ -25,7 +25,7 @@ const UserList = (props: Props) => {
   // SAY HELLOW I AM LOGIN
   useEffect(() => {
     sockContext.socketPong.emit('online', me.id);
-  }, [sockContext.socketPong]);
+  }, []);
 
   //////////////// GAME ///////////////////////////////////////////////////////////////
 
@@ -35,7 +35,7 @@ const UserList = (props: Props) => {
 
   useEffect(() => {
     sockContext.socketPong.on('statusOfUsers', updateStatusUser);
-  }, [sockContext.socketPong]);
+  }, []);
 
   function getStatusOfUser(userId: string) {
     const status = usersStatus[userId];

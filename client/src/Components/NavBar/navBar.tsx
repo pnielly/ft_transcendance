@@ -3,8 +3,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import AdbIcon from '@mui/icons-material/Adb';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../Contexts/userContext';
 import { Outlet } from 'react-router-dom';
 import UserMenu from './userMenu';
@@ -17,11 +16,13 @@ import { Grid } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import '../../CSS/neon-flicker.css'
+import { SocketContext } from '../../Contexts/socket';
 
 const ResponsiveAppBar = () => {
   const me = useContext(UserContext).user;
   let navigate = useNavigate();
   const [showLogout, setShowLogout] = useState<boolean>(false);
+  const sockContext = useContext(SocketContext);
 
   const menuClicked = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, setting: string) => {
     event.preventDefault();
@@ -36,6 +37,7 @@ const ResponsiveAppBar = () => {
         .get(`${process.env.REACT_APP_DEFAULT_URL}/auth/logout`, { withCredentials: true })
         .then((res) => {
           setShowLogout(true);
+          sockContext.socketPong.emit('offline');
           navigate('/home');
         })
         .catch((err) => console.log(err));

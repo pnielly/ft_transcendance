@@ -35,10 +35,10 @@ const GameInvites = (props: Props) => {
     setAnchorElInvites(null);
   };
 
-  // tell pong i m online
-  useEffect(() => {
-    sockContext.socketPong.emit('online', me.id);
-  }, [sockContext.socketPong]);
+  // // tell pong i m online
+  // useEffect(() => {
+  //   sockContext.socketPong.emit('online', me.id);
+  // }, [sockContext.socketPong]);
 
   /////////// UPDATE GAME INVITES ///////////////////////////////////:
 

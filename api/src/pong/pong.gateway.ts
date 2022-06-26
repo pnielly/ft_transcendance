@@ -80,8 +80,6 @@ export class PongGateway
       return this.disconnect(client);
     }
 
-
-
     console.log(client.id, 'pong connected');
   }
 
@@ -105,9 +103,7 @@ export class PongGateway
     if (this.gameRooms[client.id] && !this.gameRooms[client.id].players[1]) {
       delete this.gameRooms[client.id];
     }
-    this.server.emit('statusOfUsers', this.usersStatus);
-    console.log('disco status', this.usersStatus);
-    
+    this.server.emit('statusOfUsers', this.usersStatus);    
   }
 
   @SubscribeMessage('online')
@@ -120,10 +116,6 @@ export class PongGateway
       this.server
         .to(userId)
         .emit('updateGameInviteList', this.gameInvites[userId]);
-
-        console.log('userId', userId);
-        
-        console.log('online event status', this.usersStatus);
   }
 
   @SubscribeMessage('offline')
